@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>image analyser</title>
+    <script src="RGBAnalyse.js"></script>
+  </head>
+  <body>
+    <script>
+    function getHistorgram(img) {
+      var img = RGBAnalyse([img])[0];
+      var histogram = new Image();
+      histogram.src = img.huedata.histogram;
+      histogram.style.border = "1px solid black";
+      img.onmouseover = function(evt) { document.body.appendChild(histogram); };
+      img.onmouseout  = function(evt) { document.body.removeChild(histogram); };
+    }
+    </script>
+    <h1>A client-side histogram library for same-origin images</h1>
+    <img src="bibibis.jpg" style="width:30%" onload="getHistorgram(this)">
+    <img src="angry chicken.jpg" style="width:20%" onload="getHistorgram(this)">
+  </body>
+</html>
