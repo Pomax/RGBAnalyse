@@ -7,17 +7,19 @@
   </head>
   <body>
     <script>
-    function getHistorgram(img) {
-      var img = RGBAnalyse([img])[0];
-      var histogram = new Image();
-      histogram.src = img.huedata.histogram;
-      histogram.style.border = "1px solid black";
-      img.onmouseover = function(evt) { document.body.appendChild(histogram); };
-      img.onmouseout  = function(evt) { document.body.removeChild(histogram); };
+    function getHistogram(img) {
+      img.onload = false;
+      var src = img.src;
+      var img = RGBAnalyse.showAndTell(img, false)[0];
+      var src2 = img.RGBAnalysis.graphic;
+      img.setAttribute("width", img.width);
+      img.setAttribute("height", img.height);
+      img.onmouseover = function(evt) { img.src = src2; };
+      img.onmouseout  = function(evt) { img.src = src;  };
     }
     </script>
     <h1>A client-side histogram library for same-origin images</h1>
-    <img src="bibibis.jpg" style="width:30%" onload="getHistorgram(this)">
-    <img src="angry chicken.jpg" style="width:20%" onload="getHistorgram(this)">
+    <img src="bibibis.jpg" style="width:30%" onload="getHistogram(this)">
+    <img src="angry chicken.jpg" style="width:20%" onload="getHistogram(this)">
   </body>
 </html>
