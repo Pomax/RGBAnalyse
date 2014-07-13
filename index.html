@@ -3,23 +3,70 @@
   <head>
     <meta charset="utf-8">
     <title>image analyser</title>
-    <script src="RGBAnalyse.js"></script>
+    <script src="release/RGBAnalyse.js"></script>
+    <style>
+      div img {
+        display: inline-block;
+        vertical-align: top;
+        margin: 1em;
+      }
+      div div {
+        display: inline-block;
+      }
+      div div img {
+        display: block;
+      }
+      img.histogram.visualisation {
+        width: 200px;
+        height: 200px;
+        background: white;
+        border: 1px solid black;
+      }
+      img.spectrum.visualisation {
+        width: 200px;
+        height: 50px;
+        background: white;
+        border: 1px solid black;
+      }
+    </style>
   </head>
   <body>
-    <script>
-    function getHistogram(img) {
-      img.onload = false;
-      var src = img.src;
-      var img = RGBAnalyse.showAndTell(img, false)[0];
-      var src2 = img.RGBAnalysis.graphic;
-      img.setAttribute("width", img.width);
-      img.setAttribute("height", img.height);
-      img.onmouseover = function(evt) { img.src = src2; };
-      img.onmouseout  = function(evt) { img.src = src;  };
-    }
-    </script>
     <h1>A client-side histogram library for same-origin images</h1>
-    <img src="bibibis.jpg" style="width:30%" onload="getHistogram(this)">
-    <img src="angry chicken.jpg" style="width:20%" onload="getHistogram(this)">
+    <p><A href="http://github.com/Pomax/RGBAnalyse">by Pomax</a></p>
+    <script>
+      function analyse(img) {
+        RGBAnalyse.analyse(img, function(err, analysis) {
+          var bin = img.parentNode;
+          var div = document.createElement("div");
+
+          var viz = new Image();
+          viz.src = analysis.visualization.histogram;
+          viz.setAttribute("class", "histogram visualisation");
+          div.appendChild(viz);
+
+          var viz = new Image();
+          viz.src = analysis.visualization.spectrum;
+          viz.setAttribute("class", "spectrum visualisation");
+          div.appendChild(viz);
+
+          bin.appendChild(div);
+        });
+      };
+
+      function buildImage(idx) {
+        idx = (idx<10) ? '0' + idx : idx;
+        var img = new Image();
+        var div = document.createElement("div");
+        div.appendChild(img);
+        img.onload = function(evt) {
+          var img = evt.target;
+          setTimeout(function() { analyse(img); }, 100);
+        };
+        img.src = "images/img" + idx + ".jpg";
+        document.body.appendChild(div);
+      }
+
+      for(var i=1; i<=17; i++) { buildImage(i); }
+    </script>
   </body>
 </html>
