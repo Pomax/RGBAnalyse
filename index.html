@@ -123,26 +123,27 @@
     <script id="code">
       function analyse(img) {
         RGBAnalyse.analyse(img, function(err, data) {
-          var bin = img.parentNode;
-          var div = document.createElement("div");
+          var bin = img.parentNode,
+              div = document.createElement("div"),
+              viz;
 
-          var viz = new Image();
+          viz = new Image();
           viz.src = data.visualization.histogram;
           viz.setAttribute("class", "histogram visualisation");
           addVisualization(div, viz, "rgb histogram");
 
-          var hr = document.createElement("hr"),
-              dominant = data.analysis.hsl.dominant,
+          viz = document.createElement("hr");
+          var dominant = data.analysis.hsl.dominant,
               rgb = RGBAnalyse.computeRGB(dominant);
           hr.style.background = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
           addVisualization(div, hr, "dominant hue");
 
-          var viz = new Image();
+          viz = new Image();
           viz.src = data.visualization.spectrum.spectogram;
           viz.setAttribute("class", "spectogram visualisation");
           addVisualization(div, viz, "spectrogram");
 
-          var viz = new Image();
+          viz = new Image();
           viz.src = data.visualization.spectrum.histogram;
           viz.setAttribute("class", "spectral histogram visualisation");
           addVisualization(div, viz, "spectral histogram");
