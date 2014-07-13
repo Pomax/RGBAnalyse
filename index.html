@@ -5,6 +5,13 @@
     <title>image analyser</title>
     <script src="release/RGBAnalyse.js"></script>
     <style>
+      html, body {
+        margin: 0,
+        padding: 0;
+      }
+      div {
+        min-height: 460px;
+      }
       div img {
         display: inline-block;
         vertical-align: top;
@@ -12,46 +19,143 @@
       }
       div div {
         display: inline-block;
+        padding-top: 1em;
+      }
+      div div h2 {
+        margin: 0;
+        font-family: helvetica;
+        font-size: 100%;
+        font-variant: small-caps;
       }
       div div img {
+        margin: 0;
         display: block;
       }
-      img.histogram.visualisation {
+      div div img.histogram.visualisation {
         width: 200px;
         height: 200px;
         background: white;
         border: 1px solid black;
       }
-      img.spectrum.visualisation {
+      div div img.spectral.histogram.visualisation {
         width: 200px;
-        height: 50px;
+        height: 120px;
+        background: black;
+        border: 1px solid black;
+      }
+      div div img.spectogram.visualisation {
+        width: 200px;
+        height: 20px;
         background: white;
         border: 1px solid black;
+      }
+      div div hr {
+        margin: 0;
+        border: 1px solid black;
+        width: 200px;
+        height: 10px;
+      }
+      dl {
+        font-family: arial;
+        margin-left: 2em;
+      }
+      dl dt {
+        font-weight: bold;
+        font-size: 80%;
+      }
+      dl dd {
+        position: relative;
+        top: -1em;
+        margin-left: 12em;
+        margin-bottom: -1em;
       }
     </style>
   </head>
   <body>
     <h1>A client-side histogram library for same-origin images</h1>
     <p><A href="http://github.com/Pomax/RGBAnalyse">by Pomax</a></p>
-    <script>
+
+    <p>This library sets up a global RGBAnalyse object, which has a
+      fairly straight-forward API:</p>
+
+    <dl>
+      <dt>defaults</dt><dd>a settings object with default values as analysis options.</dd>
+      <dt>analyse(img,[options])</dt><dd>performs image analysis on an image element, with optional tweaks.</dd>
+      <dt>computeHSL(r,g,b)</dt><dd>convert RGB to HSL (note this requires normalised RGB values).</dd>
+      <dt>analyse(img,[options])</dt><dd>convert HSL to rgb (plain {r,g,b}, using range [0,255]).</dd>
+    </dl>
+
+    <p>The analyse function returns a two property object. The first is the "analysis" property,
+      which houses:</p>
+
+    <dl>
+      <dt>rgb</dt><dd>A 3 component object with the histographical data for r, g and b.</dd>
+      <dt>RGB</dt><dd>A 3 component object with the histographical data for R, G,a nd B.</dd>
+      <dt>hsl</dt><dd>An object with the histographical data for h, and the dominant h as single value.</dd>
+      <dt>average</dt><dd>the weighted averages for r, g, b, R, G, B, and h.</dd>
+      <dt>maxima</dt><dd>the absolute maxima for r, g, b, R, G, B, and h.</dd>
+    </dl>
+
+    <p>The second is the "visualization" property, which houses image src data-uris for:</p>
+
+    <dl>
+      <dt>histogram</dt><dd>a 256 x 256 combined rgb histogram</dd>
+      <dt>spectrum.histogram</dt><dd>a 360 x 200 hues histogram</dd>
+      <dt>spectrum.spectogram</dt><dd>a 360 x 50 spectrogram</dd>
+    </dl>
+
+    <h1>Some example images</h1>
+
+    <script id="code">
       function analyse(img) {
-        RGBAnalyse.analyse(img, function(err, analysis) {
+        RGBAnalyse.analyse(img, function(err, data) {
           var bin = img.parentNode;
           var div = document.createElement("div");
 
           var viz = new Image();
-          viz.src = analysis.visualization.histogram;
+          viz.src = data.visualization.histogram;
           viz.setAttribute("class", "histogram visualisation");
-          div.appendChild(viz);
+          addVisualization(div, viz, "rgb histogram");
+
+          var hr = document.createElement("hr"),
+              dominant = data.analysis.hsl.dominant,
+              rgb = RGBAnalyse.computeRGB(dominant);
+          hr.style.background = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
+          addVisualization(div, hr, "dominant hue");
 
           var viz = new Image();
-          viz.src = analysis.visualization.spectrum;
-          viz.setAttribute("class", "spectrum visualisation");
-          div.appendChild(viz);
+          viz.src = data.visualization.spectrum.spectogram;
+          viz.setAttribute("class", "spectogram visualisation");
+          addVisualization(div, viz, "spectrogram");
+
+          var viz = new Image();
+          viz.src = data.visualization.spectrum.histogram;
+          viz.setAttribute("class", "spectral histogram visualisation");
+          addVisualization(div, viz, "spectral histogram");
 
           bin.appendChild(div);
         });
       };
+    </script>
+
+    <p>As a demonastrator, the following images have all been run
+      through the RGBAnalyser, using the following code:</p>
+
+    <pre id="codeblock"></pre>
+
+    <script>
+       var p = document.getElementById("codeblock");
+       var s = document.getElementById("code");
+       p.textContent = s.innerHTML;
+    </script>
+
+    <script>
+      function addVisualization(container, element, text) {
+        var label = document.createElement("h2");
+        label.textContent = text;
+        container.appendChild(label);
+        container.appendChild(element);
+      }
 
       function buildImage(idx) {
         idx = (idx<10) ? '0' + idx : idx;

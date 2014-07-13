@@ -126,8 +126,9 @@
       var len = hues.length;
       var max = 0;
       var idx = 0;
-      for(var i=0; i<hues.length; i++) {
-        var sum = 0;
+      var sum, i, j;
+      for(i=0; i<len; i++) {
+        sum = 0;
         for(j=-5; j<5; j++) {
           sum += hues[(len+i+j)%len];
         }

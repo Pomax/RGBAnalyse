@@ -3,24 +3,38 @@
 
   var common = require("./common");
 
-  function generateSpectralLines(imageData) {
-    var hdim = 50;
+  function hslVisualization(imageData) {
+    var hdim = 200;
+    var sdim = 50;
     var hues = imageData.hsl.h;
     var hmax = imageData.maxima.H;
-    var surface = common.generateCanvas(hues.length, hdim);
+    var histogram = common.generateCanvas(hues.length, hdim);
+    var spectogram = common.generateCanvas(hues.length, sdim);
     hues.forEach(function(hue, index) {
       var rgb = common.computeRGB(index/100,100,100);
-      surface.strokeStyle = "rgba("+rgb.r+","+rgb.g+","+rgb.b+","+(hue/hmax)+")";
-      surface.beginPath();
-      surface.moveTo(index, hdim);
-      surface.lineTo(index, 0);
-      surface.stroke();
-      surface.closePath();
+
+      histogram.strokeStyle = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
+      histogram.beginPath();
+      histogram.moveTo(index, hdim);
+      histogram.lineTo(index, hdim - hdim*(hue/hmax));
+      histogram.stroke();
+      histogram.closePath();
+
+      spectogram.strokeStyle = "rgba("+rgb.r+","+rgb.g+","+rgb.b+","+(hue/hmax)+")";
+      spectogram.beginPath();
+      spectogram.moveTo(index, sdim);
+      spectogram.lineTo(index, 0);
+      spectogram.stroke();
+      spectogram.closePath();
     });
-    return common.toDataURL(surface);
+
+    return {
+      spectogram: common.toDataURL(spectogram),
+      histogram: common.toDataURL(histogram)
+    };
   }
 
-  function generateHistogram(imageData) {
+  function rgbVisualization(imageData) {
     var channels = [
       {color: 'red',   data: imageData.rgb.r, pref:'255,0,0'},
       {color: 'green', data: imageData.rgb.g, pref:'0,255,0'},
@@ -66,8 +80,8 @@
    */
   module.exports = function generateVisualisation(imageData) {
     return {
-      spectrum: generateSpectralLines(imageData),
-      histogram: generateHistogram(imageData)
+      spectrum: hslVisualization(imageData),
+      histogram: rgbVisualization(imageData)
     };
   };
 

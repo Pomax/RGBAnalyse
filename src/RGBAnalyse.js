@@ -5,11 +5,19 @@
 (function() {
   "use strict";
 
+  var common = require("./common");
+
   var RGBAnalyse = {
+
     defaults: {
       hueshift: 1,
       chromacutoff: 0.07
     },
+
+    computeRGB: common.computeRGB,
+
+    computeHSL: common.computeHSL,
+
     analyse: function(img, options, callback) {
       if(options && !callback) {
         callback = options;

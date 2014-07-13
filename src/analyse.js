@@ -57,13 +57,14 @@ module.exports = function analyse(img, options, defaults, callback) {
       if(hsl.C > defaults.chromacutoff) {
         hue[(100*hsl.H)|0]++;
       }
-
     }
+
+    var d = common.getDominantHue(hue);
 
     callback(false, {
       rgb: { r:red, g:green, b:blue },
       RGB: { r:RED, g:GREEN, b:BLUE },
-      hsl: { h:hue, s:false, l:false, c:false },
+      hsl: { h:hue, s:false, l:false, c:false, dominant: d },
       average: {
         r:common.avg(red),
         g:common.avg(green),

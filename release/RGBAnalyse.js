@@ -15,11 +15,19 @@ module.exports = (function() {
 (function() {
   "use strict";
 
+  var common = require("./common");
+
   var RGBAnalyse = {
+
     defaults: {
       hueshift: 1,
       chromacutoff: 0.07
     },
+
+    computeRGB: common.computeRGB,
+
+    computeHSL: common.computeHSL,
+
     analyse: function(img, options, callback) {
       if(options && !callback) {
         callback = options;
@@ -39,174 +47,7 @@ module.exports = (function() {
   module.exports = RGBAnalyse;
 }());
 
-},{"./analyse":3,"./generate":4}],3:[function(require,module,exports){
-/**
- *
- */
-module.exports = function analyse(img, options, defaults, callback) {
-  "use strict";
-
-  var common = require("./common");
-  var generateVisualization = require("./generate");
-
-  common.getImageData(img, function(err, data) {
-
-    if(!data) {
-      return setTimeout(function() {
-        callback(new Error("error: locked or empty image:"));
-      },0);
-    }
-    var len = data.length;
-
-    // set up histogram containers
-    var red    = common.generateArray(256,0);
-    var green  = red.slice();
-    var blue   = red.slice();
-    var RED    = common.generateArray(101,0);
-    var GREEN  = RED.slice();
-    var BLUE   = GREEN.slice();
-    var hue    = common.generateArray((100*common.τ)|0, 0);
-    var r, g, b, M, R, G, B, hsl, H, i;
-
-    // aggregate all the interesting data
-    for(i=0; i<len; i+=4) {
-
-      // rgb data:
-      r = data[i];
-      g = data[i+1];
-      b = data[i+2];
-
-      // rgb histogram data:
-      red[r]++;
-      green[g]++;
-      blue[b]++;
-
-      // normalised rgb data:
-      M = common.max3(r,g,b) * 3;
-      R = r/M;
-      G = g/M;
-      B = b/M;
-
-      // normalised rgb histogram data:
-      RED[(R*100)|0]++;
-      GREEN[(G*100)|0]++;
-      BLUE[(B*100)|0]++;
-
-      // hsl data:
-      hsl = common.computeHSL(R,G,B);
-
-      // hue histogram:
-      if(hsl.C > defaults.chromacutoff) {
-        hue[(100*hsl.H)|0]++;
-      }
-
-    }
-
-    callback(false, {
-      rgb: { r:red, g:green, b:blue },
-      RGB: { r:RED, g:GREEN, b:BLUE },
-      hsl: { h:hue, s:false, l:false, c:false },
-      average: {
-        r:common.avg(red),
-        g:common.avg(green),
-        b:common.avg(blue),
-        R:common.avg(RED),
-        G:common.avg(GREEN),
-        B:common.avg(BLUE),
-        H:common.avg(hue)
-      },
-      maxima: {
-        r:common.max(red),
-        g:common.max(green),
-        b:common.max(blue),
-        R:common.max(RED),
-        G:common.max(GREEN),
-        B:common.max(BLUE),
-        H:common.max(hue)
-      }
-    });
-
-  });
-
-};
-
-},{"./common":5,"./generate":4}],4:[function(require,module,exports){
-(function() {
-  "use strict";
-
-  var common = require("./common");
-
-  function generateSpectralLines(imageData) {
-    var hdim = 50;
-    var hues = imageData.hsl.h;
-    var hmax = imageData.maxima.H;
-    var surface = common.generateCanvas(hues.length, hdim);
-    hues.forEach(function(hue, index) {
-      var rgb = common.computeRGB(index/100,100,100);
-      surface.strokeStyle = "rgba("+rgb.r+","+rgb.g+","+rgb.b+","+(hue/hmax)+")";
-      surface.beginPath();
-      surface.moveTo(index, hdim);
-      surface.lineTo(index, 0);
-      surface.stroke();
-      surface.closePath();
-    });
-    return common.toDataURL(surface);
-  }
-
-  function generateHistogram(imageData) {
-    var channels = [
-      {color: 'red',   data: imageData.rgb.r, pref:'255,0,0'},
-      {color: 'green', data: imageData.rgb.g, pref:'0,255,0'},
-      {color: 'blue',  data: imageData.rgb.b, pref:'0,0,255'}
-    ];
-
-    var dim = 256;
-    var maxima = imageData.maxima;
-    var max = common.scale( common.max3(maxima.r, maxima.g, maxima.b) );
-    var surface = common.generateCanvas(dim, dim);
-    channels.forEach(function(channel) {
-      var cutoff = channel.cutoff;
-      channel.data.forEach(function(v,idx) {
-        surface.strokeStyle = "rgba(" + channel.pref + ","+(0.33 * (idx/255))+")";
-        surface.beginPath();
-        surface.moveTo(idx, dim);
-        surface.lineTo(idx, dim - dim*common.scale(v)/max);
-        surface.stroke();
-        surface.closePath();
-      });
-    });
-    var pixelData = surface.getImageData(0,0,dim,dim);
-    var pixels = pixelData.data, r,g,b,m,i,abs=Math.abs,t=40;
-    for(i=pixels.length-1; i>0; i-=4) {
-      r = pixels[i-3];
-      g = pixels[i-2];
-      b = pixels[i-1];
-      m = ((r+b+g)/3)|0;
-      if(abs(m-r)<t && abs(m-g)<t && abs(m-b)<t) {
-        pixels[i-3] = 120;
-        pixels[i-2] = 120;
-        pixels[i-1] = 120;
-      }
-      pixels[i] = (pixels[i]+r+g+b < 10) ? 0 : 255 * (((i/4)%dim)/dim)|0;
-    }
-    surface.putImageData(pixelData,0,0);
-
-    return common.toDataURL(surface);
-  }
-
-  /**
-   * Generate histogram renderings
-   */
-  module.exports = function generateVisualisation(imageData) {
-    return {
-      spectrum: generateSpectralLines(imageData),
-      histogram: generateHistogram(imageData)
-    };
-  };
-
-}());
-
-},{"./common":5}],5:[function(require,module,exports){
+},{"./analyse":5,"./common":3,"./generate":4}],3:[function(require,module,exports){
 (function() {
   "use strict";
 
@@ -335,8 +176,9 @@ module.exports = function analyse(img, options, defaults, callback) {
       var len = hues.length;
       var max = 0;
       var idx = 0;
-      for(var i=0; i<hues.length; i++) {
-        var sum = 0;
+      var sum, i, j;
+      for(i=0; i<len; i++) {
+        sum = 0;
         for(j=-5; j<5; j++) {
           sum += hues[(len+i+j)%len];
         }
@@ -377,5 +219,187 @@ module.exports = function analyse(img, options, defaults, callback) {
 
 }());
 
-},{}]},{},[1])
+},{}],4:[function(require,module,exports){
+(function() {
+  "use strict";
+
+  var common = require("./common");
+
+  function hslVisualization(imageData) {
+    var hdim = 200;
+    var sdim = 50;
+    var hues = imageData.hsl.h;
+    var hmax = imageData.maxima.H;
+    var histogram = common.generateCanvas(hues.length, hdim);
+    var spectogram = common.generateCanvas(hues.length, sdim);
+    hues.forEach(function(hue, index) {
+      var rgb = common.computeRGB(index/100,100,100);
+
+      histogram.strokeStyle = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
+      histogram.beginPath();
+      histogram.moveTo(index, hdim);
+      histogram.lineTo(index, hdim - hdim*(hue/hmax));
+      histogram.stroke();
+      histogram.closePath();
+
+      spectogram.strokeStyle = "rgba("+rgb.r+","+rgb.g+","+rgb.b+","+(hue/hmax)+")";
+      spectogram.beginPath();
+      spectogram.moveTo(index, sdim);
+      spectogram.lineTo(index, 0);
+      spectogram.stroke();
+      spectogram.closePath();
+    });
+
+    return {
+      spectogram: common.toDataURL(spectogram),
+      histogram: common.toDataURL(histogram)
+    };
+  }
+
+  function rgbVisualization(imageData) {
+    var channels = [
+      {color: 'red',   data: imageData.rgb.r, pref:'255,0,0'},
+      {color: 'green', data: imageData.rgb.g, pref:'0,255,0'},
+      {color: 'blue',  data: imageData.rgb.b, pref:'0,0,255'}
+    ];
+
+    var dim = 256;
+    var maxima = imageData.maxima;
+    var max = common.scale( common.max3(maxima.r, maxima.g, maxima.b) );
+    var surface = common.generateCanvas(dim, dim);
+    channels.forEach(function(channel) {
+      var cutoff = channel.cutoff;
+      channel.data.forEach(function(v,idx) {
+        surface.strokeStyle = "rgba(" + channel.pref + ","+(0.33 * (idx/255))+")";
+        surface.beginPath();
+        surface.moveTo(idx, dim);
+        surface.lineTo(idx, dim - dim*common.scale(v)/max);
+        surface.stroke();
+        surface.closePath();
+      });
+    });
+    var pixelData = surface.getImageData(0,0,dim,dim);
+    var pixels = pixelData.data, r,g,b,m,i,abs=Math.abs,t=40;
+    for(i=pixels.length-1; i>0; i-=4) {
+      r = pixels[i-3];
+      g = pixels[i-2];
+      b = pixels[i-1];
+      m = ((r+b+g)/3)|0;
+      if(abs(m-r)<t && abs(m-g)<t && abs(m-b)<t) {
+        pixels[i-3] = 120;
+        pixels[i-2] = 120;
+        pixels[i-1] = 120;
+      }
+      pixels[i] = (pixels[i]+r+g+b < 10) ? 0 : 255 * (((i/4)%dim)/dim)|0;
+    }
+    surface.putImageData(pixelData,0,0);
+
+    return common.toDataURL(surface);
+  }
+
+  /**
+   * Generate histogram renderings
+   */
+  module.exports = function generateVisualisation(imageData) {
+    return {
+      spectrum: hslVisualization(imageData),
+      histogram: rgbVisualization(imageData)
+    };
+  };
+
+}());
+
+},{"./common":3}],5:[function(require,module,exports){
+/**
+ *
+ */
+module.exports = function analyse(img, options, defaults, callback) {
+  "use strict";
+
+  var common = require("./common");
+  var generateVisualization = require("./generate");
+
+  common.getImageData(img, function(err, data) {
+
+    if(!data) {
+      return setTimeout(function() {
+        callback(new Error("error: locked or empty image:"));
+      },0);
+    }
+    var len = data.length;
+
+    // set up histogram containers
+    var red    = common.generateArray(256,0);
+    var green  = red.slice();
+    var blue   = red.slice();
+    var RED    = common.generateArray(101,0);
+    var GREEN  = RED.slice();
+    var BLUE   = GREEN.slice();
+    var hue    = common.generateArray((100*common.τ)|0, 0);
+    var r, g, b, M, R, G, B, hsl, H, i;
+
+    // aggregate all the interesting data
+    for(i=0; i<len; i+=4) {
+
+      // rgb data:
+      r = data[i];
+      g = data[i+1];
+      b = data[i+2];
+
+      // rgb histogram data:
+      red[r]++;
+      green[g]++;
+      blue[b]++;
+
+      // normalised rgb data:
+      M = common.max3(r,g,b) * 3;
+      R = r/M;
+      G = g/M;
+      B = b/M;
+
+      // normalised rgb histogram data:
+      RED[(R*100)|0]++;
+      GREEN[(G*100)|0]++;
+      BLUE[(B*100)|0]++;
+
+      // hsl data:
+      hsl = common.computeHSL(R,G,B);
+
+      // hue histogram:
+      if(hsl.C > defaults.chromacutoff) {
+        hue[(100*hsl.H)|0]++;
+      }
+    }
+
+    var d = common.getDominantHue(hue);
+
+    callback(false, {
+      rgb: { r:red, g:green, b:blue },
+      RGB: { r:RED, g:GREEN, b:BLUE },
+      hsl: { h:hue, s:false, l:false, c:false, dominant: d },
+      average: {
+        r:common.avg(red),
+        g:common.avg(green),
+        b:common.avg(blue),
+        R:common.avg(RED),
+        G:common.avg(GREEN),
+        B:common.avg(BLUE),
+        H:common.avg(hue)
+      },
+      maxima: {
+        r:common.max(red),
+        g:common.max(green),
+        b:common.max(blue),
+        R:common.max(RED),
+        G:common.max(GREEN),
+        B:common.max(BLUE),
+        H:common.max(hue)
+      }
+    });
+
+  });
+
+};
+
+},{"./common":3,"./generate":4}]},{},[1])
 ;
