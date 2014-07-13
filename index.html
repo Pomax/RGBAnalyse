@@ -69,11 +69,25 @@
         margin-left: 12em;
         margin-bottom: -1em;
       }
+      .download {
+        background: #DDD;
+      }
+      a, a:visited, a:hover, a:active {
+        text-decoration: none;
+        color: rgb(20,70,225);
+      }
+      a:hover {
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
     <h1>A client-side histogram library for same-origin images</h1>
     <p><A href="http://github.com/Pomax/RGBAnalyse">by Pomax</a></p>
+
+    <p><span class="download">Download the library <a href="http://pomax.github.io/RGBAnalyse/release/RGBAnalyse.js">here</a>
+      while I set up a <a href="http://bower.io">bower</a> entry for it. Once that's up, it'll probably be easier
+      to just use "bower install rgbanalyse".</span></p>
 
     <p>This library sets up a global RGBAnalyse object, which has a
       fairly straight-forward API:</p>
