@@ -135,7 +135,7 @@
           viz = document.createElement("hr");
           var dominant = data.analysis.hsl.dominant,
               rgb = RGBAnalyse.computeRGB(dominant);
-          hr.style.background = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
+          viz.style.background = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
           addVisualization(div, viz, "dominant hue");
 
           viz = new Image();
