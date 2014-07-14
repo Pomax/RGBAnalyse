@@ -3,12 +3,12 @@
   "author": "Mike \"Pomax\" Kamermans",
   "version": "0.1.0",
   "repository": {
-    "type" : "git",
-    "url" : "http://github.com/Pomax/RGBAnalyse.git"
+    "type": "git",
+    "url": "http://github.com/Pomax/RGBAnalyse.git"
   },
   "dependencies": {
     "browserify": "~2.18.1",
-    "node-minify": "~0.7.3"
+    "uglify-js": "~2.4.15"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -17,6 +17,6 @@
   },
   "scripts": {
     "test": "grunt",
-    "build": "browserify index.js -o release/RGBAnalyse.js --standalone RGBAnalyse"
+    "build": "browserify index.js --standalone RGBAnalyse | uglifyjs -o release/RGBAnalyse.js"
   }
 }
