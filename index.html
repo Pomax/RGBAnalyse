@@ -9,47 +9,51 @@
         margin: 0,
         padding: 0;
       }
-      div {
-        min-height: 460px;
+      #images div {
+        min-height: 550px;
+        overflow: hidden;
       }
-      div img {
+      #images div img {
         display: inline-block;
         vertical-align: top;
         margin: 1em;
       }
-      div div {
+      #images div div {
         display: inline-block;
         padding-top: 1em;
+        height: 0;
+        overflow: visible;
+        min-height: 0;
       }
-      div div h2 {
+      #images div div h2 {
         margin: 0;
         font-family: helvetica;
         font-size: 100%;
         font-variant: small-caps;
       }
-      div div img {
+      #images div div img {
         margin: 0;
         display: block;
       }
-      div div img.histogram.visualisation {
+      #images div div img.histogram.visualisation {
         width: 200px;
         height: 200px;
         background: white;
         border: 1px solid black;
       }
-      div div img.spectral.histogram.visualisation {
+      #images div div img.spectral.histogram.visualisation {
         width: 200px;
         height: 120px;
         background: black;
         border: 1px solid black;
       }
-      div div img.spectogram.visualisation {
+      #images div div img.spectogram.visualisation {
         width: 200px;
         height: 20px;
         background: white;
         border: 1px solid black;
       }
-      div div hr {
+      #images div div hr {
         margin: 0;
         border: 1px solid black;
         width: 200px;
@@ -164,6 +168,9 @@
        p.textContent = s.innerHTML;
     </script>
 
+    <div id="images"></div>
+    <footer>All images (c) Mike "Pomax" Kamermans, hit up <a href="http://flickr.com/Pomax">Flickr</a> for additional information (and more photographs).</footer>
+
     <script>
       function addVisualization(container, element, text) {
         var label = document.createElement("h2");
@@ -182,7 +189,7 @@
           setTimeout(function() { analyse(img); }, 100);
         };
         img.src = "images/img" + idx + ".jpg";
-        document.body.appendChild(div);
+        document.getElementById("images").appendChild(div);
       }
 
       for(var i=1; i<=17; i++) { buildImage(i); }
