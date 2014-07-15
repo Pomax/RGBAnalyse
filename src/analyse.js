@@ -59,7 +59,7 @@ module.exports = function analyse(img, options, defaults, callback) {
       }
     }
 
-    var d = common.getDominantHue(hue);
+    var d = common.getDominantHue(hue, defaults);
 
     callback(false, {
       rgb: { r:red, g:green, b:blue },
