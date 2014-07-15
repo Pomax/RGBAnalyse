@@ -122,14 +122,16 @@
     /**
      *
      */
-    getDominantHue: function getDominantHue(hues) {
+    getDominantHue: function getDominantHue(hues, defaults) {
+      defaults = defaults || {};
+      var k = defaults.smoothing || 5;
       var len = hues.length;
       var max = 0;
       var idx = 0;
       var sum, i, j;
       for(i=0; i<len; i++) {
         sum = 0;
-        for(j=-5; j<5; j++) {
+        for(j=-k; j<k; j++) {
           sum += hues[(len+i+j)%len];
         }
         if(sum > max) {
