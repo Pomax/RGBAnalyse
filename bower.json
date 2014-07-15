@@ -1,0 +1,26 @@
+{
+  "name": "rgbanalyse",
+  "version": "0.1.0",
+  "homepage": "https://pomax.github.io/RGBAnalyse",
+  "repository": {
+    "type" : "git",
+    "url" : "http://github.com/Pomax/RGBAnalyse.git"
+  },
+  "authors": [
+    "Mike 'Pomax' Kamermans <pomax@nihongoresources.com>"
+  ],
+  "description": "An RGB-HC histogram library for same-origin images",
+  "main": "./release/RGBAnalyse.js",
+  "keywords": [
+    "image processing",
+    "rgb",
+    "hsl",
+    "hue"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ]
+}
