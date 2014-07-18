@@ -25,7 +25,10 @@
       }
       require("./analyse")(img, options, RGBAnalyse.defaults, function(err, analysis) {
         setTimeout(function() {
-          callback(err, {
+          if (err) {
+            return callback(err);
+          }
+          callback(false, {
             analysis: analysis,
             visualization: require("./generate")(analysis)
           });
