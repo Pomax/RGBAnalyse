@@ -10,7 +10,11 @@
   var RGBAnalyse = {
 
     defaults: {
+      // hue curve smoothing interval (pixels from the center)
+      smoothing: 5,
+      // used for shifting the "starting hue" when sorting.
       hueshift: 1,
+      // used in determine neutral colors (H has no meaning on them)
       chromacutoff: 0.07
     },
 
