@@ -102,6 +102,13 @@
       <dt>analyse(img,[options])</dt><dd>convert HSL to rgb (plain {r,g,b}, using range [0,255]).</dd>
     </dl>
 
+    <p>The defaults object can be set prior to running analyses, and currently supports the following properties:</p>
+
+    <dl>
+      <dt>neutrals</dt><dd>10; integer from 0 to 255, indicating the how close together {r,g,b} coordinates must be to be considered neutral</dd>
+      <dt>smoothing</dt><dd>5; used to smooth the hue spectrum when determining dominant hues. (value is distance from mean)</dd>
+    </dl>
+
     <p>The analyse function returns a two property object. The first is the "analysis" property,
       which houses:</p>
 
@@ -156,10 +163,10 @@
           img.onmouseover = function() {
             bin.replaceChild(data.analysis.lab, img);
           };
+
           data.analysis.lab.onmouseout = function() {
             bin.replaceChild(img, data.analysis.lab);
           };
-
         });
       };
     </script>

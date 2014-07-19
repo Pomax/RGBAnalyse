@@ -6,6 +6,15 @@
     τ: 2*Math.PI,
 
     /**
+     * Set default values if not found in an options object
+     */
+    setDefaults: function(options, defaults) {
+      Object.keys(defaults).forEach(function(key) {
+        options[key] = (typeof options[key] === "undefined") ? defaults[key] : options[key];
+      });
+    },
+
+    /**
      *
      */
     scale: function scale(v) {

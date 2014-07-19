@@ -5,6 +5,7 @@ module.exports = function analyse(img, options, defaults, callback) {
   "use strict";
 
   var common = require("./common");
+  common.setDefaults(options, defaults);
   var ciemodels = require("./ciemodels");
   var generateVisualization = require("./generate");
 
@@ -32,16 +33,22 @@ module.exports = function analyse(img, options, defaults, callback) {
     var Cdata = common.getCanvasData(Cimage);
     var Cpixels = Cdata.data;
 
-    function analyse(r,g,b,a) {
-      if(r+b+g <= 6) { r=0; g=0; b=0; }
+    function neutral(r,g,b) {
+      var m = (r+b+g)/3,
+          c = Math.abs(r-m) < options.neutrals,
+          d = Math.abs(g-m) < options.neutrals,
+          e = Math.abs(b-m) < options.neutrals;
+      return c && d && e;
+    }
 
+    function analyse(r,g,b,a) {
       // rgb histogram data:
       red[r]++;
       green[g]++;
       blue[b]++;
 
       // normalised rgb data:
-      M = common.max3(r,g,b) * 3;
+      M = neutral(r,g,b) ? 0 : common.max3(r,g,b) * 3;
       R = M < 4 ? 1/3 : r/M;
       G = M < 4 ? 1/3 : g/M;
       B = M < 4 ? 1/3 : b/M;
@@ -60,7 +67,7 @@ module.exports = function analyse(img, options, defaults, callback) {
       // hsl data:
       hsl = common.computeHSL(R,G,B);
 
-      if(hsl.C*255 > 50) {
+      if(hsl.C*255 > 25) {
         hue[(100*hsl.H)|0]++;
       }
     }
@@ -80,7 +87,7 @@ module.exports = function analyse(img, options, defaults, callback) {
     var Lcanvas = Cimage.canvas;
     Lcanvas.setAttribute("class", "demo");
 
-    var d = common.getDominantHue(hue, defaults);
+    var d = common.getDominantHue(hue, options);
 
     callback(false, {
       rgb: { r:red, g:green, b:blue },
