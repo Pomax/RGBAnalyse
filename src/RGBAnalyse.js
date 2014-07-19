@@ -18,9 +18,9 @@
       chromacutoff: 0.07
     },
 
-    computeRGB: common.computeRGB,
+    computeRGB: common.computeRGB.bind(common),
 
-    computeHSL: common.computeHSL,
+    computeHSL: common.computeHSL.bind(common),
 
     analyse: function(img, options, callback) {
       if(options && !callback) {

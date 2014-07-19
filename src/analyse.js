@@ -33,6 +33,8 @@ module.exports = function analyse(img, options, defaults, callback) {
     var Cpixels = Cdata.data;
 
     function analyse(r,g,b,a) {
+      if(r+b+g <= 6) { r=0; g=0; b=0; }
+
       // rgb histogram data:
       red[r]++;
       green[g]++;
@@ -40,9 +42,9 @@ module.exports = function analyse(img, options, defaults, callback) {
 
       // normalised rgb data:
       M = common.max3(r,g,b) * 3;
-      R = r/M;
-      G = g/M;
-      B = b/M;
+      R = M < 4 ? 1/3 : r/M;
+      G = M < 4 ? 1/3 : g/M;
+      B = M < 4 ? 1/3 : b/M;
 
       // normalised rgb histogram data:
       RED[(R*100)|0]++;
@@ -66,7 +68,7 @@ module.exports = function analyse(img, options, defaults, callback) {
     // aggregate all the interesting data
     for(i=0; i<len; i+=4) {
       analyse(data[i], data[i+1], data[i+2], data[i+3]);
-      v = hsl.C*255;
+      v = Math.min(hsl.C*255,255);
       Cpixels[i]   = v;
       Cpixels[i+1] = v;
       Cpixels[i+2] = v;
