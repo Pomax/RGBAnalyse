@@ -165,6 +165,14 @@
         var data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
         handler(false, data);
       } catch (e) { handler(e, false); }
+    },
+
+    /**
+     *
+     */
+    getCanvasData: function(context) {
+      var c = context.canvas;
+      return context.getImageData(0,0,c.width,c.height);
     }
 
   };

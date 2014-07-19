@@ -12,7 +12,7 @@
       #images div {
         min-height: 550px;
       }
-      #images div img {
+      #images div .demo {
         display: inline-block;
         vertical-align: top;
         margin: 1em;
@@ -152,6 +152,14 @@
           addVisualization(div, viz, "spectral histogram");
 
           bin.appendChild(div);
+
+          img.onmouseover = function() {
+            bin.replaceChild(data.analysis.lab, img);
+          };
+          data.analysis.lab.onmouseout = function() {
+            bin.replaceChild(img, data.analysis.lab);
+          };
+
         });
       };
     </script>
@@ -181,6 +189,7 @@
       function buildImage(idx) {
         idx = (idx<10) ? '0' + idx : idx;
         var img = new Image();
+        img.setAttribute("class", "demo");
         var div = document.createElement("div");
         div.appendChild(img);
         img.onload = function(evt) {
@@ -191,7 +200,8 @@
         document.getElementById("images").appendChild(div);
       }
 
-      for(var i=1; i<=17; i++) { buildImage(i); }
+      var imgcount = 17;
+      for(var i=1; i<=imgcount; i++) { buildImage(i); }
     </script>
   </body>
 </html>

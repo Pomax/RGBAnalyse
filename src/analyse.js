@@ -5,6 +5,7 @@ module.exports = function analyse(img, options, defaults, callback) {
   "use strict";
 
   var common = require("./common");
+  var ciemodels = require("./ciemodels");
   var generateVisualization = require("./generate");
 
   common.getImageData(img, function(err, data) {
@@ -24,16 +25,14 @@ module.exports = function analyse(img, options, defaults, callback) {
     var GREEN  = RED.slice();
     var BLUE   = GREEN.slice();
     var hue    = common.generateArray((100*common.τ)|0, 0);
-    var r, g, b, M, R, G, B, hsl, H, i;
+    var r, g, b, M, R, G, B, hsl, H, i, v;
+    var XYZ, Lab;
 
-    // aggregate all the interesting data
-    for(i=0; i<len; i+=4) {
+    var Cimage = common.generateCanvas(img.width, img.height);
+    var Cdata = common.getCanvasData(Cimage);
+    var Cpixels = Cdata.data;
 
-      // rgb data:
-      r = data[i];
-      g = data[i+1];
-      b = data[i+2];
-
+    function analyse(r,g,b,a) {
       // rgb histogram data:
       red[r]++;
       green[g]++;
@@ -50,14 +49,34 @@ module.exports = function analyse(img, options, defaults, callback) {
       GREEN[(G*100)|0]++;
       BLUE[(B*100)|0]++;
 
+      if(options.computeLab) {
+        //Observer = 2°, Illuminant = D65\
+        XYZ = ciemodels.toXYZ("sRGB", R,G,B);
+        Lab = ciemodels.toLab(XYZ.X, XYZ.Y, XYZ.Z);
+      }
+
       // hsl data:
       hsl = common.computeHSL(R,G,B);
 
-      // hue histogram:
-      if(hsl.C > defaults.chromacutoff) {
+      if(hsl.C*255 > 50) {
         hue[(100*hsl.H)|0]++;
       }
     }
+
+    // aggregate all the interesting data
+    for(i=0; i<len; i+=4) {
+      analyse(data[i], data[i+1], data[i+2], data[i+3]);
+      v = hsl.C*255;
+      Cpixels[i]   = v;
+      Cpixels[i+1] = v;
+      Cpixels[i+2] = v;
+      Cpixels[i+3] = 255;
+    }
+
+    try { Cimage.putImageData(Cdata, 0, 0); } catch (e) { console.error(e); }
+
+    var Lcanvas = Cimage.canvas;
+    Lcanvas.setAttribute("class", "demo");
 
     var d = common.getDominantHue(hue, defaults);
 
@@ -82,7 +101,8 @@ module.exports = function analyse(img, options, defaults, callback) {
         G:common.max(GREEN),
         B:common.max(BLUE),
         H:common.max(hue)
-      }
+      },
+      lab : Lcanvas
     });
 
   });
