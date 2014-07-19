@@ -66,8 +66,7 @@ module.exports = function analyse(img, options, defaults, callback) {
 
       // hsl data:
       hsl = common.computeHSL(R,G,B);
-
-      if(hsl.C*255 > 25) {
+      if(hsl.C > 0) {
         hue[(100*hsl.H)|0]++;
       }
     }
@@ -76,9 +75,10 @@ module.exports = function analyse(img, options, defaults, callback) {
     for(i=0; i<len; i+=4) {
       analyse(data[i], data[i+1], data[i+2], data[i+3]);
       v = Math.min(hsl.C*255,255);
-      Cpixels[i]   = v;
-      Cpixels[i+1] = v;
-      Cpixels[i+2] = v;
+      var moo = common.computeRGB(hsl.H, hsl.S, hsl.L);
+      Cpixels[i]   = v === 0 ? 0 : moo.r;
+      Cpixels[i+1] = v === 0 ? 0 : moo.g;
+      Cpixels[i+2] = v === 0 ? 0 : moo.b;
       Cpixels[i+3] = 255;
     }
 
