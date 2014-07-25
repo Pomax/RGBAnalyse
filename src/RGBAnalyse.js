@@ -13,7 +13,9 @@
       // +/- interval for neutral colours
       neutrals: 10,
       // hue curve smoothing interval (pixels from the center)
-      smoothing: 5
+      smoothing: 5,
+      // minimum distance between dominant hues
+      distance: 10
     },
 
     computeRGB: common.computeRGB.bind(common),

@@ -17,7 +17,7 @@
   },
   "scripts": {
     "test": "grunt",
-    "build": "browserify index.js --standalone RGBAnalyse | uglifyjs -o release/RGBAnalyse.js",
-    "build-dev": "browserify index.js --standalone RGBAnalyse -o release/RGBAnalyse.js"
+    "build": "rm ./release/RGBAnalyse.js | browserify index.js --standalone RGBAnalyse | uglifyjs -o ./release/RGBAnalyse.js",
+    "build-dev": "rm ./release/RGBAnalyse.js | browserify index.js --standalone RGBAnalyse -o ./release/RGBAnalyse.js"
   }
 }

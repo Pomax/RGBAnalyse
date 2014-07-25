@@ -87,7 +87,7 @@ module.exports = function analyse(img, options, defaults, callback) {
     var Lcanvas = Cimage.canvas;
     Lcanvas.setAttribute("class", "demo");
 
-    var d = common.getDominantHue(hue, options);
+    var d = common.getDominantHues(hue, options);
 
     callback(false, {
       rgb: { r:red, g:green, b:blue },

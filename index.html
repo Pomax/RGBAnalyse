@@ -58,6 +58,9 @@
         width: 200px;
         height: 10px;
       }
+      #images div div hr + hr {
+        margin-top: 1px;
+      }
       dl {
         font-family: arial;
         margin-left: 2em;
@@ -132,7 +135,7 @@
 
     <script id="code">
       function analyse(img) {
-        RGBAnalyse.analyse(img, function(err, data) {
+        RGBAnalyse.analyse(img, { neutrals: 20, smoothing: 25, distance: 20 }, function(err, data) {
           var bin = img.parentNode,
               div = document.createElement("div"),
               viz;
@@ -142,11 +145,13 @@
           viz.setAttribute("class", "histogram visualisation");
           addVisualization(div, viz, "rgb histogram");
 
-          viz = document.createElement("hr");
-          var dominant = data.analysis.hsl.dominant,
-              rgb = RGBAnalyse.computeRGB(dominant);
-          viz.style.background = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
-          addVisualization(div, viz, "dominant hue");
+          var dominant = data.analysis.hsl.dominant;
+          dominant.forEach(function(color, idx) {
+            viz = document.createElement("hr");
+            var rgb = RGBAnalyse.computeRGB(color.H)
+            viz.style.background = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
+            addVisualization(div, viz, idx===0 ? "major hues" : false);
+          });
 
           viz = new Image();
           viz.src = data.visualization.spectrum.spectogram;
@@ -187,9 +192,11 @@
 
     <script>
       function addVisualization(container, element, text) {
-        var label = document.createElement("h2");
-        label.textContent = text;
-        container.appendChild(label);
+        if(text) {
+          var label = document.createElement("h2");
+          label.textContent = text;
+          container.appendChild(label);
+        }
         container.appendChild(element);
       }
 

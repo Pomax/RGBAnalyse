@@ -131,24 +131,52 @@
     /**
      *
      */
-    getDominantHue: function getDominantHue(hues, defaults) {
-      defaults = defaults || {};
-      var k = defaults.smoothing || 5;
+    getDominantHues: function getDominantHue(hues, options) {
+      options = options || {};
+      var k = options.smoothing || 5;
+      var interval = 1 + 2*k;
       var len = hues.length;
       var max = 0;
       var idx = 0;
       var sum, i, j;
+
+      // smooth data
+      var smoothed = [];
       for(i=0; i<len; i++) {
         sum = 0;
-        for(j=-k; j<k; j++) {
-          sum += hues[(len+i+j)%len];
-        }
-        if(sum > max) {
-          max = sum;
-          idx = i;
+        for(j=-k; j<k; j++) { sum += hues[(len+i+j)%len]; }
+        if(sum > max) { max = sum; idx = i; }
+        smoothed[i] = sum/interval;
+      }
+
+      // simple bypass-derivative scan for dominant hues
+      var derivative = [], p, n;
+      for(i=0; i<len; i++) {
+        p = hues[(i-1)%len];
+        n = hues[(i+1)%len];
+        derivative[i] = (n<p) ? -1 : 1;
+      }
+
+      // find dominant hues
+      var dominant = [], l, c, color, d = options.distance/100;
+      for(i=0; i<len; i++) {
+        p = derivative[(i-1)%len];
+        c = derivative[i];
+        if(p>0 && c<0) {
+          color = { H: i/100, strength: hues[i] };
+          if (dominant.length === 0 || color.H - l.H >= d) {
+            dominant.push(color);
+            l = color;
+          }
         }
       }
-      return idx / 100;
+
+      // find 5 most dominant hues
+      return dominant.sort(function(a,b) {
+        a = a.strength;
+        b = b.strength;
+        return b-a;
+      }).slice(0,5);
     },
 
     /**
