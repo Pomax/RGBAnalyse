@@ -108,8 +108,9 @@
     <p>The defaults object can be set prior to running analyses, and currently supports the following properties:</p>
 
     <dl>
-      <dt>neutrals</dt><dd>10; integer from 0 to 255, indicating the how close together {r,g,b} coordinates must be to be considered neutral</dd>
-      <dt>smoothing</dt><dd>5; used to smooth the hue spectrum when determining dominant hues. (value is distance from mean)</dd>
+      <dt>neutrals</dt><dd>10 - integer from 0 to 255, indicating the how close together {r,g,b} coordinates must be to be considered neutral</dd>
+      <dt>smoothing</dt><dd>5 - used to smooth the hue spectrum when determining dominant hues. (value is distance from mean)</dd>
+      <dt>distance</dt><dd>10 - minimum distance between recording two hues to end up recorded as major hues (value can range from 0 to 628)</dd>
     </dl>
 
     <p>The analyse function returns a two property object. The first is the "analysis" property,
