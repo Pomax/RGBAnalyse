@@ -4,6 +4,7 @@
 module.exports = function analyse(img, options, defaults, callback) {
   "use strict";
 
+  var inbrowser = (typeof window !== "undefined");
   var common = require("./common");
   common.setDefaults(options, defaults);
   var ciemodels = require("./ciemodels");
@@ -16,6 +17,9 @@ module.exports = function analyse(img, options, defaults, callback) {
         callback(new Error("error: locked or empty image:"));
       },0);
     }
+
+    img = data;
+    data = img.data;
     var len = data.length;
 
     // set up histogram containers
@@ -28,10 +32,13 @@ module.exports = function analyse(img, options, defaults, callback) {
     var hue    = common.generateArray((100*common.τ)|0, 0);
     var r, g, b, M, R, G, B, hsl, H, i, v;
     var XYZ, Lab;
+    var Cimage, Cdata, Cpixels, Lcanvas;
 
-    var Cimage = common.generateCanvas(img.width, img.height);
-    var Cdata = common.getCanvasData(Cimage);
-    var Cpixels = Cdata.data;
+    if(inbrowser) {
+      Cimage = common.generateCanvas(img.width, img.height);
+      Cdata = common.getCanvasData(Cimage);
+      Cpixels = Cdata.data;
+    }
 
     function neutral(r,g,b) {
       var m = (r+b+g)/3,
@@ -74,18 +81,22 @@ module.exports = function analyse(img, options, defaults, callback) {
     // aggregate all the interesting data
     for(i=0; i<len; i+=4) {
       analyse(data[i], data[i+1], data[i+2], data[i+3]);
-      v = Math.min(hsl.C*255,255);
-      var moo = common.computeRGB(hsl.H, hsl.S, hsl.L);
-      Cpixels[i]   = v === 0 ? 255 : moo.r;
-      Cpixels[i+1] = v === 0 ? 255 : moo.g;
-      Cpixels[i+2] = v === 0 ? 255 : moo.b;
-      Cpixels[i+3] = 255;
+
+      if (inbrowser) {
+        v = Math.min(hsl.C*255,255);
+        var moo = common.computeRGB(hsl.H, hsl.S, hsl.L);
+        Cpixels[i]   = v === 0 ? 255 : moo.r;
+        Cpixels[i+1] = v === 0 ? 255 : moo.g;
+        Cpixels[i+2] = v === 0 ? 255 : moo.b;
+        Cpixels[i+3] = 255;
+      }
     }
 
-    try { Cimage.putImageData(Cdata, 0, 0); } catch (e) { console.error(e); }
-
-    var Lcanvas = Cimage.canvas;
-    Lcanvas.setAttribute("class", "demo");
+    if (inbrowser) {
+      try { Cimage.putImageData(Cdata, 0, 0); } catch (e) { console.error(e); }
+      Lcanvas = Cimage.canvas;
+      Lcanvas.setAttribute("class", "demo");
+    }
 
     var d = common.getDominantHues(hue, options);
 

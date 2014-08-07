@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "browserify": "~2.18.1",
+    "jpeg-js": "0.0.4",
+    "pngjs": "^0.4.0",
     "uglify-js": "~2.4.15"
   },
   "devDependencies": {

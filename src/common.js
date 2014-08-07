@@ -105,9 +105,11 @@
     },
 
     /**
-     * Generate RGB values
+     * Generate RGB values (S/L not used atm)
+     * H in range [0, 6.28]
      */
     computeRGB: function computeRGB(H,S,L) {
+      H *= (6/this.τ);
       var r = ((H < 1) ? 255           :
                (H < 2) ? (1-(H-1))*255 :
                (H < 4) ? 0             :
@@ -180,29 +182,38 @@
     },
 
     /**
-     *
+     * If browser, use canvas to deal with an Image(). If node,
+     * load image data from file.
      */
-    getImageData: function(img, handler) {
-      if(img.width === 0) {
-        var fn = function() {
-          this.getImageData(img, handler);
-        }.bind(this);
-        return setTimeout(fn, 100);
-      }
+    getImageData: (function() {
+      if(typeof window === "undefined") return require("./getimagedata");
 
-      var nimg = new Image();
-      nimg.src = img.src;
-      img = nimg;
-      var canvas = this.create('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      var ctx = canvas.getContext('2d');
-      ctx.drawImage(img,0,0);
-      try {
-        var data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
-        handler(false, data);
-      } catch (e) { handler(e, false); }
-    },
+      return function(img, handler) {
+        if(img.width === 0) {
+          var fn = function() {
+            this.getImageData(img, handler);
+          }.bind(this);
+          return setTimeout(fn, 100);
+        }
+
+        var nimg = new Image();
+        nimg.src = img.src;
+        img = nimg;
+        var canvas = this.create('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0);
+        try {
+          var data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+          handler(false, {
+            height: canvas.height,
+            width: canvas.width,
+            data: data
+          });
+        } catch (e) { handler(e, false); }
+      };
+    }()),
 
     /**
      *

@@ -1,6 +1,7 @@
 (function() {
   "use strict";
 
+  var inbrowser = (typeof window !== "undefined");
   var common = require("./common");
 
   function hslVisualization(imageData) {

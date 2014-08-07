@@ -5,8 +5,8 @@
 (function() {
   "use strict";
 
+  var inbrowser = (typeof window !== "undefined");
   var common = require("./common");
-
   var RGBAnalyse = {
 
     defaults: {
@@ -34,7 +34,7 @@
           }
           callback(false, {
             analysis: analysis,
-            visualization: require("./generate")(analysis)
+            visualization: inbrowser ? require("./generate")(analysis) : undefined
           });
         },0);
       });
