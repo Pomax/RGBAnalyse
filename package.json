@@ -1,7 +1,10 @@
 {
-  "name": "RGBAnalyse",
+  "name": "rgbanalyse",
   "author": "Mike 'Pomax' Kamermans <pomax@nihongoresources.com>",
   "version": "0.1.7",
+  "description": "A pure javascript image analysis library for generating RGB/H(SL)C histogram information",
+  "keywords": ["image","processing","analysis","histogram","rgb","hsl","lab"],
+  "homepage": "https://pomax.github.io/RGBAnalyse",
   "repository": {
     "type": "git",
     "url": "http://github.com/Pomax/RGBAnalyse.git"
