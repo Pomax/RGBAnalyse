@@ -1,6 +1,6 @@
 {
   "name": "rgbanalyse",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "homepage": "https://pomax.github.io/RGBAnalyse",
   "repository": {
     "type" : "git",
@@ -11,6 +11,14 @@
   ],
   "description": "An RGB-HC histogram library for same-origin images",
   "main": "./release/RGBAnalyse.js",
+  "ignore": [
+    "src",
+    "images",
+    "index.html",
+    "index.js",
+    "test.js",
+    "package.json"
+  ],
   "keywords": [
     "image processing",
     "rgb",
