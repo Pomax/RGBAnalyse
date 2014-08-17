@@ -183,7 +183,10 @@
 
     /**
      * If browser, use canvas to deal with an Image(). If node,
-     * load image data from file.
+     * load image data from file. Note that the browser version
+     * can take both an Image or a Canvas element as "img" input,
+     * because you might load images through JS decoders in the
+     * browser to circumvent incorrect application of color profiles.
      */
     getImageData: (function() {
       if(typeof window === "undefined") return require("./getimagedata");
@@ -195,6 +198,10 @@
           }.bind(this);
           return setTimeout(fn, 100);
         }
+        
+        if(img instanceof HTMLCanvasElement) {
+          img = { src: img.toDataURL("image/png") };
+        }
 
         var nimg = new Image();
         nimg.src = img.src;
@@ -204,6 +211,7 @@
         canvas.height = img.height;
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img,0,0);
+
         try {
           var data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
           handler(false, {

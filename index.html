@@ -209,7 +209,9 @@
         div.appendChild(img);
         img.onload = function(evt) {
           var img = evt.target;
-          setTimeout(function() { analyse(img); }, 100);
+          setTimeout(function() { 
+            analyse(img);
+          }, 100);
         };
         img.src = "images/img" + idx + ".jpg";
         document.getElementById("images").appendChild(div);

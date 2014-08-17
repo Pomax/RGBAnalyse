@@ -4,4 +4,4 @@
   this code is to be considered under an MIT
   license (http://opensource.org/licenses/MIT)
 */
-module.exports = require("./src/RGBanalyse");
+module.exports = require("./src/RGBAnalyse");
